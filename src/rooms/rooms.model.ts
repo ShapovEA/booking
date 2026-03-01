@@ -9,12 +9,12 @@ export enum RoomType {
     PREMIUM = 'PREMIUM'
 }
 
-@Schema({collection: 'rooms'})
+@Schema({ collection: 'rooms' })
 export class RoomsModel {
     @Prop({ required: true, unique: true })
     number: number;
 
-    @Prop({ type: RoomType, required: true })
+    @Prop({ type: String, enum: RoomType, required: true })
     type: RoomType
 
     @Prop({ required: true, default: false })

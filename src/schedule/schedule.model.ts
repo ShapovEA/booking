@@ -6,6 +6,7 @@ export enum BookingStatus {
     CONFIRMED = 'CONFIRMED',
     CHECKED_IN = 'CHECKED_IN',
     CHECKED_OUT = 'CHECKED_OUT',
+    EXTENSION = 'EXTENSION',
     CANCELED = 'CANCELED'
 }
 
@@ -18,7 +19,7 @@ export class ScheduleModel {
     @Prop({ required: true })
     date: string
 
-    @Prop({ type: BookingStatus, required: true })
+    @Prop({ type: String, enum: BookingStatus, required: true })
     status: BookingStatus
 }
 

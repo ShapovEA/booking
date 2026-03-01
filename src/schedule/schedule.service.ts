@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { BookingStatus, ScheduleDocument, ScheduleModel } from './schedule.model';
-import { Model, Types } from 'mongoose';
+import { Model, MongooseError, Types } from 'mongoose';
 import { CreateScheduleDto } from './dto/create.schedule.dto';
 import { PatchScheduleDto } from './dto/patch.schedule.dto';
 
@@ -10,10 +10,22 @@ export class ScheduleService {
     constructor(@InjectModel(ScheduleModel.name) private readonly scheduleModel: Model<ScheduleModel>) { }
 
     async create(dto: CreateScheduleDto): Promise<ScheduleDocument> {
-        if (!this.isValidDate(dto.date)) {
-            throw new BadRequestException('Date must be in YYYY-MM-DD format')
+        try {
+            if (!this.isValidDate(dto.date)) {
+                throw new BadRequestException('Date must be in YYYY-MM-DD format')
+            }
+            return await this.scheduleModel.create({ ...dto, status: BookingStatus.PENDING });
+        } catch (error) {
+            if (error instanceof MongooseError && error.name === 'ValidationError') {
+                throw new BadRequestException(error.message);
+            }
+
+            if (error instanceof Error && error.name === 'MongoServerError' && error.message.includes('duplicate')) {
+                throw new ConflictException(error.message);
+            }
+
+            throw error;
         }
-        return await this.scheduleModel.create({ ...dto, status: BookingStatus.PENDING });
     }
 
     async getBookings(): Promise<ScheduleDocument[]> {
