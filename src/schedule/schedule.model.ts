@@ -18,7 +18,7 @@ export class ScheduleModel {
     @Prop({ required: true })
     date: string
 
-    @Prop({ required: true })
+    @Prop({ type: BookingStatus, required: true })
     status: BookingStatus
 }
 

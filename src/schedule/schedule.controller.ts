@@ -1,7 +1,7 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create.schedule.dto';
-import { BookingStatus, ScheduleDocument } from './schedule.model';
+import { ScheduleDocument } from './schedule.model';
 import { PatchScheduleDto } from './dto/patch.schedule.dto';
 
 @Controller('schedule')
