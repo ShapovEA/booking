@@ -8,7 +8,7 @@ import { PatchScheduleDto } from './dto/patch.schedule.dto';
 export class ScheduleController {
     constructor(private scheduleService: ScheduleService) { }
 
-    @Post('create')
+    @Post()
     async create(@Body() dto: CreateScheduleDto): Promise<ScheduleDocument> {
         return this.scheduleService.create(dto);
     }
@@ -16,6 +16,11 @@ export class ScheduleController {
     @Get()
     async getBookings() {
         return this.scheduleService.getBookings()
+    }
+
+    @Get('byId/:id')
+    async getById(@Param('id') id: string) {
+        return await this.scheduleService.getById(id);
     }
 
     @Get('byRoomId/:roomId')

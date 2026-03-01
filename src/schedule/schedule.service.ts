@@ -36,11 +36,15 @@ export class ScheduleService {
         return this.scheduleModel.find({ roomId });
     }
 
+    async getById(id: string): Promise<ScheduleDocument[] | null> {
+        return this.scheduleModel.findById(id);
+    }
+
     async changeStatus(dto: PatchScheduleDto): Promise<ScheduleDocument | null> {
         if (!BookingStatus[dto.status]) {
             throw new BadRequestException(`Invalid status has been provided. There is no as such as ${dto.status} status`)
         }
-        return await this.scheduleModel.findByIdAndUpdate(dto.roomId, { status: dto.status });
+        return await this.scheduleModel.findByIdAndUpdate(dto._id, { status: dto.status }, { new: true });
     }
 
     async deleteById(id: string): Promise<ScheduleDocument | null> {

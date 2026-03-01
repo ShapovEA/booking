@@ -1,6 +1,7 @@
 import { BookingStatus } from "../schedule.model";
 
 export class PatchScheduleDto {
-    roomId: string;
+    _id: string;
+    roomId?: string;
     status: BookingStatus;
 }
