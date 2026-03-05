@@ -11,7 +11,10 @@ import { getDBConfig } from './configs/db.config';
   imports: [
     ScheduleModule,
     RoomsModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : `.env`
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
