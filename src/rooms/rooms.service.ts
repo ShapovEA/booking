@@ -27,7 +27,7 @@ export class RoomsService {
 
     async update(dto: UpdateRoomDto): Promise<RoomsDocument> {
         const { _id, ...rest } = dto;
-        const result = await this.roomModel.findByIdAndUpdate(_id, { ...rest });
+        const result = await this.roomModel.findByIdAndUpdate(_id, { ...rest }, { returnDocument: 'after' });
 
         if (!result) {
             throw new NotFoundException("Room was not found by id provided");
