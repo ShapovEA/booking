@@ -100,6 +100,15 @@ describe('RoomsController (e2e)', () => {
     expect(body._id).toBe(created.id);
   });
 
+  it('/ (PATCH - FAIL)', async () => {
+    const created = await roomsModel.create(createDto);
+    const updateFailDto = { _id: created.id, number: '2' }
+    const { body }: request.Response = await request(app.getHttpServer())
+      .patch(`/rooms/`)
+      .send(updateFailDto)
+      .expect(400)
+  });
+
   it('/byId/:roomId (DELETE - SUCCESS)', async () => {
     const created = await roomsModel.create(createDto);
     const { body }: request.Response = await request(app.getHttpServer())

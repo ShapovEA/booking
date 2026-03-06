@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create.schedule.dto';
 import { ScheduleDocument } from './schedule.model';
@@ -8,6 +8,7 @@ import { PatchScheduleDto } from './dto/patch.schedule.dto';
 export class ScheduleController {
     constructor(private scheduleService: ScheduleService) { }
 
+    @UsePipes(new ValidationPipe())
     @Post()
     async create(@Body() dto: CreateScheduleDto): Promise<ScheduleDocument> {
         return this.scheduleService.create(dto);
@@ -28,6 +29,7 @@ export class ScheduleController {
         return this.scheduleService.getByRoomId(roomId);
     }
 
+    @UsePipes(new ValidationPipe())
     @Patch()
     async changeStatus(@Body() dto: PatchScheduleDto): Promise<ScheduleDocument | null> {
         return this.scheduleService.changeStatus(dto);

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create.room.dto';
 import { UpdateRoomDto } from './dto/update.room.dto';
@@ -18,11 +18,13 @@ export class RoomsController {
         return await this.roomsService.getById(roomId);
     }
 
+    @UsePipes(new ValidationPipe())
     @Post()
     async createRoom(@Body() dto: CreateRoomDto): Promise<RoomsDocument> {
         return await this.roomsService.create(dto);
     }
 
+    @UsePipes(new ValidationPipe())
     @Patch()
     async updateRoom(@Body() dto: UpdateRoomDto): Promise<RoomsDocument | null> {
         return this.roomsService.update(dto);

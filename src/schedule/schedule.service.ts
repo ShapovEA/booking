@@ -16,10 +16,6 @@ export class ScheduleService {
             }
             return await this.scheduleModel.create({ ...dto, status: BookingStatus.PENDING });
         } catch (error) {
-            if (error instanceof MongooseError && error.name === 'ValidationError') {
-                throw new BadRequestException(error.message);
-            }
-
             if (error instanceof Error && error.name === 'MongoServerError' && error.message.includes('duplicate')) {
                 throw new ConflictException(error.message);
             }

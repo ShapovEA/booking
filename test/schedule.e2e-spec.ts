@@ -106,6 +106,16 @@ describe('ScheduleController (e2e)', () => {
     expect(body._id).toBe(created.id);
   });
 
+
+  it('/ (PATCH - FAIL)', async () => {
+    const created = await scheduleModel.create(createDto);
+    const updateFailDto = { _id: created.id, status: 'status' }
+    const { body }: request.Response = await request(app.getHttpServer())
+      .patch(`/schedule/`)
+      .send(updateFailDto)
+      .expect(400)
+  });
+
   it(':id (DELETE - SUCCESS)', async () => {
     const created = await scheduleModel.create(createDto);
     const { body }: request.Response = await request(app.getHttpServer())
