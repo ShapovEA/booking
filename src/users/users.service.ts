@@ -6,6 +6,7 @@ import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateUserDTO } from './dto/update.user.dto';
 import { ERRORS } from 'src/constants/errors';
 import { UpdateUserByAdminDTO } from './dto/update.user.admin.dto';
+import { genSalt, hash } from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +28,17 @@ export class UsersService {
 
     async createUser(dto: CreateUserDTO): Promise<UserDocument> {
         try {
-            return await this.userModel.create(dto);
+            const salt = await genSalt(10);
+            const passwordHash = await hash(dto.password, salt);
+            return await this.userModel.create({
+                email: dto.email,
+                firstName: dto.firstName,
+                middleName: dto?.middleName,
+                lastName: dto?.lastName,
+                passwordHash,
+                phoneNumber: dto.phoneNumber,
+                roles: dto.roles
+            });
         } catch (error) {
             this.handleDuplicateError(error);
             throw error;

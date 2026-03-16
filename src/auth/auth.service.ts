@@ -6,10 +6,15 @@ import { RegisterAuthDTO } from './dto/register.auth.dto';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { LoginAuthDTO } from './dto/login.auth.dto';
 import { ERRORS } from 'src/constants/errors';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/constants/types';
 
 @Injectable()
 export class AuthService {
-    constructor(@InjectModel(UserModel.name) private readonly userModel: Model<UserModel>) { }
+    constructor(
+        @InjectModel(UserModel.name) private readonly userModel: Model<UserModel>,
+        private readonly jwtService: JwtService
+    ) { }
     async register(dto: RegisterAuthDTO): Promise<UserDocument> {
         try {
             const salt = await genSalt(10);
@@ -24,7 +29,7 @@ export class AuthService {
         }
     }
 
-    async validate(dto: LoginAuthDTO): Promise<Pick<UserModel, 'email'> & Pick<UserModel, 'roles'> & { id: string }> {
+    async validate(dto: LoginAuthDTO): Promise<JwtPayload> {
         const user = await this.userModel.findOne({ email: dto.email });
         if (!user) {
             throw new UnauthorizedException(ERRORS.LOGIN_ATTEMPT_FAILED);
@@ -37,9 +42,16 @@ export class AuthService {
         return { id: user.id, email: user.email, roles: user.roles }
     }
 
+    async login(user: JwtPayload): Promise<{ access_token: string }> {
+        const payload = { id: user.id, email: user.email, roles: user.roles };
+        return {
+            access_token: await this.jwtService.signAsync(payload)
+        }
+    }
+
     private handleDuplicateError(error: any) {
         if (error instanceof Error && error.name === 'MongoServerError' && error.message.includes('duplicate')) {
-            throw new ConflictException(error.message)
+            throw new ConflictException(error.message);
         }
     }
 }

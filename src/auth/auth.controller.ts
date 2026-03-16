@@ -18,6 +18,6 @@ export class AuthController {
     @Post('login')
     async login(@Body() dto: LoginAuthDTO) {
         const user = await this.authService.validate(dto);
-        return user;
+        return this.authService.login(user);
     }
 }
