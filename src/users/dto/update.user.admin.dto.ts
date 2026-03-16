@@ -8,10 +8,6 @@ export class UpdateUserByAdminDTO {
 
     @IsString()
     @IsOptional()
-    password?: string;
-
-    @IsString()
-    @IsOptional()
     firstName?: string;
 
     @IsString()
