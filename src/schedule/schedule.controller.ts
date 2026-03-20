@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create.schedule.dto';
 import { ScheduleDocument } from './schedule.model';
@@ -52,5 +52,15 @@ export class ScheduleController {
     @Delete(':id')
     async delete(@Param('id') id: string): Promise<ScheduleDocument | null> {
         return this.scheduleService.deleteById(id);
+    }
+
+    @Roles(UserRole.admin)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get('report/byMonth')
+    async getReportByMonth(@Query('month') month: number) {
+        if (!month) {
+            throw new BadRequestException("The month param is required");
+        }
+        return await this.scheduleService.getReportByMonth(month);
     }
 }
