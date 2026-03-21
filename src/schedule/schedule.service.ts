@@ -14,7 +14,7 @@ export class ScheduleService {
             if (!this.isValidDate(dto.date)) {
                 throw new BadRequestException('Date must be in YYYY-MM-DD format')
             }
-            return await this.scheduleModel.create({ ...dto, status: BookingStatus.PENDING });
+            return await this.scheduleModel.create({ ...dto, roomId: new Types.ObjectId(dto.roomId), status: BookingStatus.PENDING });
         } catch (error) {
             if (error instanceof MongooseError && error.name === 'ValidationError') {
                 throw new BadRequestException(error.message);
@@ -49,6 +49,70 @@ export class ScheduleService {
 
     async deleteById(id: string): Promise<ScheduleDocument | null> {
         return await this.scheduleModel.findByIdAndDelete(id);
+    }
+
+    async getReportByMonth(monthNumber: number) {
+        const dateFrom = new Date(Date.UTC(new Date().getFullYear(), monthNumber - 1, 1));
+        const from = dateFrom.toISOString().split('T')[0];
+
+        const dateTo = new Date(Date.UTC(new Date().getFullYear(), monthNumber, 1));
+        const to = dateTo.toISOString().split('T')[0];
+
+        return await this.scheduleModel.aggregate([
+            {
+                $match: {
+                    date: {
+                        $gte: from,
+                        $lt: to
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "rooms",
+                    localField: "roomId",
+                    foreignField: "_id",
+                    as: "rooms"
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        roomId: "roomId",
+                        number: {
+                            $arrayElemAt: ["$rooms.number", 0]
+                        }
+                    },
+                    count: {
+                        $sum: 1
+                    }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            },
+            {
+                $group: {
+                    _id: null,
+                    data: {
+                        $push: {
+                            k: {
+                                $concat: [
+                                    "Room ",
+                                    { $toString: "$_id.number" }
+                                ]
+                            },
+                            v: "$count"
+                        }
+                    }
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: { $arrayToObject: "$data" }
+                }
+            }
+        ]).exec();
     }
 
     private isValidDate(date: string): boolean {

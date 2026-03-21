@@ -6,6 +6,8 @@ import { RoomsModule } from './rooms/rooms.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { getDBConfig } from './configs/db.config';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,7 +21,9 @@ import { getDBConfig } from './configs/db.config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: getDBConfig
-    })
+    }),
+    UsersModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
