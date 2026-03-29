@@ -19,6 +19,9 @@ export class RoomsModel {
 
     @Prop({ required: true, default: false })
     hasSV: boolean
+
+    @Prop({ type: [String], default: [] })
+    images: string[]
 }
 
 export type RoomsDocument = HydratedDocument<RoomsModel>;
