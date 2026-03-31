@@ -9,6 +9,10 @@ import { getDBConfig } from './configs/db.config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
+import { TelegramModule } from './telegram/telegram.module';
+import { getTelegramConfig } from './configs/telegram.config';
+import { RoomsService } from './rooms/rooms.service';
+import { UsersService } from './users/users.service';
 
 @Module({
   imports: [
@@ -25,7 +29,12 @@ import { FilesModule } from './files/files.module';
     }),
     UsersModule,
     AuthModule,
-    FilesModule
+    FilesModule,
+    TelegramModule.forRootAsync({
+      useFactory: getTelegramConfig,
+      imports: [ConfigModule, RoomsModule, UsersModule],
+      inject: [ConfigService, RoomsService, UsersService]
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

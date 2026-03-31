@@ -7,16 +7,23 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/users/user.model';
+import { TelegramService } from 'src/telegram/telegram.service';
+import { UserId } from 'src/users/decorators/userId.decorator';
 
 @Controller('schedule')
 export class ScheduleController {
-    constructor(private scheduleService: ScheduleService) { }
+    constructor(
+        private readonly scheduleService: ScheduleService,
+        private readonly telegramService: TelegramService
+    ) { }
 
     @Roles(UserRole.user, UserRole.admin)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Post()
-    async create(@Body() dto: CreateScheduleDto): Promise<ScheduleDocument> {
-        return this.scheduleService.create(dto);
+    async create(@Body() dto: CreateScheduleDto, @UserId() userId: string): Promise<ScheduleDocument> {
+        const res = await this.scheduleService.create(dto);
+        await this.telegramService.notifyScheduleChange(userId, res.roomId.toString(), res.status);
+        return res;
     }
 
     @Roles(UserRole.admin)
@@ -43,8 +50,13 @@ export class ScheduleController {
     @Roles(UserRole.admin, UserRole.user)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Patch()
-    async changeStatus(@Body() dto: PatchScheduleDto): Promise<ScheduleDocument | null> {
-        return this.scheduleService.changeStatus(dto);
+    async changeStatus(@Body() dto: PatchScheduleDto, @UserId() userId: string): Promise<ScheduleDocument | null> {
+        const res = await this.scheduleService.changeStatus(dto);
+        if (res) {
+            await this.telegramService.notifyScheduleChange(userId, res.roomId.toString(), res.status);
+        }
+
+        return res;
     }
 
     @Roles(UserRole.admin)
