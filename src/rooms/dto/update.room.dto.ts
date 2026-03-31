@@ -5,4 +5,5 @@ export class UpdateRoomDto {
         number?: number;
         type?: RoomType;
         hasSV?: boolean;
+        images?: string[]
 }
