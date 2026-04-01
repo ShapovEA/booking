@@ -7,10 +7,13 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/users/user.model';
+import { TelegramService } from 'src/telegram/telegram.service';
 
 @Controller('rooms')
 export class RoomsController {
-    constructor(private roomsService: RoomsService) { }
+    constructor(
+        private readonly roomsService: RoomsService
+    ) { }
 
     @Get()
     async getRooms(): Promise<RoomsDocument[]> {
